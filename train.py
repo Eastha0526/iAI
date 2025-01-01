@@ -82,10 +82,10 @@ def main(info):
     # 연결 닫기
     connection.close()
     logging.info("데이터베이스 연결 닫힘")
-    bulk["SEQKEY"] = bulk["SEQKEY"].apply(pd.to_numeric)
-    proc["SEQKEY"] = proc["SEQKEY"].apply(pd.to_numeric)
-    rpm["SEQKEY"] = rpm["SEQKEY"].apply(pd.to_numeric)
-    temp["SEQKEY"] = temp["SEQKEY"].apply(pd.to_numeric)
+    bulk = data_utils.load_raw_data(bulk)
+    proc = data_utils.load_raw_data(proc)
+    rpm = data_utils.load_raw_data(rpm)
+    temp = data_utils.load_raw_data(temp)
     # 데이터 Preprocessing
     ## bulk와 proc 병합 -> btp 생성
     btp = data_utils.bulk_to_proc(bulk, proc) # rpm과 temp에 공통으로 사용되는 병합 데이터

@@ -9,43 +9,12 @@ from sklearn.model_selection import train_test_split
 
 
 # 데이터 기입 오류 정정을 위해 csv 파일을 다시 생성
-def load_raw_data(file_path):
-    csv_list = list()
-    # 정상적인 파일 읽기 확인
-    try:
-        with open(file_path, "rt", encoding='utf-8-sig') as f:
-            reader = csv.reader(f)
-            for l in reader:
-                l = [None if value in ["", "NULL"] else value.strip() for value in l]  # null이 아닌 '' 값이 존재하여 해당 값들도 null로 변경, 앞뒤 공백 제거
-                csv_list.append(l)
-    except FileNotFoundError as e:
-        print(f"Error: File not found. Details: {e}")
-        print(f"{file_path.split('/')[-1]} 데이터 로드 실패")
-        raise
-
-    df = pd.DataFrame(csv_list)
-    df = df[:-5] # 확인 결과 마지막 5개의 불필요한 행 제거
-
-    ## 밀려난 값 조정
-    none_cnt = list(df.iloc[0, :]).count(None) # 열 목록 중 None인 값의 갯수 == 밀려난 열의 수
-    if none_cnt > 0:
-        modify_idx = df[df.iloc[:, -1:].notnull().any(axis=1)].index
-        # df = swap_null(df, modify_idx, none_cnt)
-        for idx in modify_idx:
-        # 한 행에서 Null 값의 갯수마큼 col 인덱스 위치 조정
-            none_idx = [col_idx for col_idx, value in enumerate(df.iloc[idx, :]) if value==None][:none_cnt] # 밀려난 만큼만 확보
-            raw_idx = [col_idx for col_idx, _ in enumerate(df.iloc[idx, :]) if col_idx not in none_idx] # 밀린 부분의 열 번호 제외 
-            raw_idx.extend(none_idx) 
-            df.iloc[idx, :] = df.iloc[idx, raw_idx] # 열 순서 조정
-    
-    ## 조정 후 마지막 열 제거 및 columns name 재설정
-    df.columns = [col.strip() if type(col)=="str" else col for col in df.iloc[0, :]] # None 값이면 그대로 아니면 앞/뒤 공백 제거해서
-    col_cnt = len(df.iloc[0, :]) - none_cnt
-    df = df.iloc[1:, :col_cnt]
-    
-    ## 특정 자료형 형식변경
+def load_raw_data(df):
+    object_cols = df.select_dtypes(include="object").columns
+    for col in object_cols:
+        df[col] = df[col].str.strip()
     df["SEQKEY"] = df["SEQKEY"].apply(pd.to_numeric)
-    
+
     return df
 
 # bulk를 proc에 병합하는 함수
