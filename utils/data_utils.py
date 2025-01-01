@@ -214,42 +214,45 @@ def scaling(train_x, valid_x, test_x, save_path):
 
     return train_x.values, valid_x.values, test_x.values
 
-# data preprocessing
-def preprocessing(data, btp, keyword): 
+def preprocessing(data, btp, keyword):
+    logging.info("데이터 전처리 시작: %s", keyword)
+
     ## data와 btp 병합
     df = data_to_btp(data, btp)
-    print("데이터 병합 완")
-    
+    logging.info("데이터 병합 완료")
+
     ## 데이터 정리 및 자료형 변환
     object_cols = ["TypeJH", "OPRDSC_1", "OPRDSC_2"]
     df = change_col_types(df, object_cols)
-    print("열 형식 변환 완")
-    
+    logging.info("열 형식 변환 완료")
+
     ## null값 처리
     df = change_null(df, object_cols)
-    print("null값 처리 완")
-    
+    logging.info("null값 처리 완료")
+
     ## 최종 idx 열 생성
     df = make_idx(df, object_cols)
-    print("idx 생성 완")
-    
+    logging.info("idx 생성 완료")
+
     ## idx 열 기준 이상치 제거 및 idx 열 제거
     df = iqr_outlier(df)
-    print("이상치 제거 완")
-    
+    logging.info("이상치 제거 완료")
+
     ## Duration_100 데이터 scale
     df = time_series_scale(df)
-    
+    logging.info("데이터 스케일링 완료")
+
     ## Label Encoding
     encoding_df = encoding(df, object_cols, os.path.join(f"./encoder/{keyword}_label_encoder.pkl"))
-    print("인코딩 완")
+    logging.info("인코딩 완료")
 
     ## train, valid, test split
     train_x, train_y, valid_x, valid_y, test_x, test_y = split(encoding_df)
-    print("데이터 분할 완")
-    
+    logging.info("데이터 분할 완료")
+
     ## scaling
     train_x_s, valid_x_s, test_x_s = scaling(train_x, valid_x, test_x, os.path.join(f"./scaler/{keyword}_label_minmax_scaler.pkl"))
-    print("데이터 Scale 완")
-    
+    logging.info("데이터 스케일링 완료")
+
+    logging.info("데이터 전처리 완료: %s", keyword)
     return train_x_s, train_y, valid_x_s, valid_y, test_x_s, test_y

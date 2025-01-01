@@ -11,3 +11,4 @@ python-dotenv
 scikit-learn
 tqdm
 optuna
+charset-normalizer
