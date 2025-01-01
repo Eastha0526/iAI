@@ -54,46 +54,50 @@ def main(info):
     except Exception as e:
         print("데이터베이스 연결 실패:", e)
         exit()
-        # SQL 쿼리 리스트
-    queries_bulk_proc = {
-        "WO_Dsc_Bulk_V1": "SELECT * FROM iAI00.dbo.WO_Dsc_Bulk_V1",
-        "WO_Dsc_Proc_V1": "SELECT * FROM iAI00.dbo.WO_Dsc_Proc_V1",
-    }
-    queries_rpm_temp = {
-        "WO_CHV_HMRPM_V1": "SELECT * FROM iAI00.dbo.WO_CHV_HMRPM_V1",
-        "WO_CHV_MTemp_V1": "SELECT * FROM iAI00.dbo.WO_CHV_MTemp_V1",
-    }
+
 
     # 경로 지정
     home_dir = os.getcwd()
+    raw_data_dir = info["RAW_DATA_DIR"] # raw_data 위치
     os.makedirs(os.path.join(home_dir, "encoder"), exist_ok=True) # encoder 파일 저장 공간 생성
     os.makedirs(os.path.join(home_dir, "scaler"), exist_ok=True) # scaler 파일 저장 공간 생성
     os.makedirs(os.path.join(home_dir, "model_weight"), exist_ok=True) # 모델 가중치 or 모델 파일 저장 공간 생성
     model_weight_path = os.path.join(home_dir, "model_weight") # 모델 저장 경로 정의
     
-    # 각 쿼리 실행, 데이터프레임 생성 및 전처리
+    # 데이터프레임 생성
     try:
-        for table_name, query in queries_bulk_proc.items():
-            raw_df = pd.read_sql(query, connection)
-            dataframes_bulk_proc[table_name] = pd.read_sql(query, connection)
-            print(f"{table_name} 데이터 불러오기 및 전처리 성공")
-        for table_name, query in queries_rpm_temp.items():
-            raw_df = pd.read_sql(query, connection)
-            dataframes_rpm_temp[table_name] = data_utils.preprocess_dataframe(raw_df)
-            print(f"{table_name} 데이터 불러오기 및 전처리 성공")
+        logging.info("쿼리 실행 중: WO_Dsc_Bulk_V1")
+        bulk = pd.read_sql("SELECT * FROM iAI00.dbo.WO_Dsc_Bulk_V1", connection)
+        logging.info("WO_Dsc_Bulk_V1 데이터 불러오기 성공")
+
+        logging.info("쿼리 실행 중: WO_Dsc_Proc_V1")
+        proc = pd.read_sql("SELECT * FROM iAI00.dbo.WO_Dsc_Proc_V1", connection)
+        logging.info("WO_Dsc_Proc_V1 데이터 불러오기 성공")
+
+        logging.info("쿼리 실행 중: WO_CHV_HMRPM_V1")
+        rpm = pd.read_sql("SELECT * FROM iAI00.dbo.WO_CHV_HMRPM_V1", connection)
+        logging.info("WO_CHV_HMRPM_V1 데이터 불러오기 성공")
+
+        logging.info("쿼리 실행 중: WO_CHV_MTemp_V1")
+        temp = pd.read_sql("SELECT * FROM iAI00.dbo.WO_CHV_MTemp_V1", connection)
+        logging.info("WO_CHV_MTemp_V1 데이터 불러오기 성공")
     except Exception as e:
-        print("데이터 불러오기 실패:", e)
+        logging.error("데이터 불러오기 실패: %s", e)
 
     # 연결 닫기
     connection.close()
     logging.info("데이터베이스 연결 닫힘")
+    bulk["SEQKEY"] = bulk["SEQKEY"].apply(pd.to_numeric)
+    proc["SEQKEY"] = proc["SEQKEY"].apply(pd.to_numeric)
+    rpm["SEQKEY"] = rpm["SEQKEY"].apply(pd.to_numeric)
+    temp["SEQKEY"] = temp["SEQKEY"].apply(pd.to_numeric)
     # 데이터 Preprocessing
     ## bulk와 proc 병합 -> btp 생성
-    btp = data_utils.bulk_to_proc(dataframes_bulk_proc['WO_Dsc_Bulk_V1'], dataframes_bulk_proc['WO_Dsc_Proc_V1']) # rpm과 temp에 공통으로 사용되는 병합 데이터
+    btp = data_utils.bulk_to_proc(bulk, proc) # rpm과 temp에 공통으로 사용되는 병합 데이터
     print("\nRPM 전처리 시작")
-    train_rpm_x_s, train_rpm_y, valid_rpm_x_s, valid_rpm_y, test_rpm_x_s, test_rpm_y = data_utils.preprocessing(dataframes_rpm_temp['WO_CHV_HMRPM_V1'], btp, "RPM")
+    train_rpm_x_s, train_rpm_y, valid_rpm_x_s, valid_rpm_y, test_rpm_x_s, test_rpm_y = data_utils.preprocessing(rpm, btp, "RPM")
     print("RPM 전처리 완료\n\nTemp 전처리 시작")
-    train_temp_x_s, train_temp_y, valid_temp_x_s, valid_temp_y, test_temp_x_s, test_temp_y = data_utils.preprocessing(dataframes_rpm_temp['WO_CHV_MTemp_V1'], btp, "Temp")
+    train_temp_x_s, train_temp_y, valid_temp_x_s, valid_temp_y, test_temp_x_s, test_temp_y = data_utils.preprocessing(temp, btp, "Temp")
     print("Temp 전처리 완료")
     
     rpm_tuple = train_utils.make_train_model_data(info, train_rpm_x_s, train_rpm_y, valid_rpm_x_s, valid_rpm_y, test_rpm_x_s, test_rpm_y)
