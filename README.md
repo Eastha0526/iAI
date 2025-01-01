@@ -3,7 +3,7 @@
 ## 파일 설명
 
 ### config.yaml
-  - 하이퍼 파라미터(device, batch_size, epoch, learning rate 등 학습 및 추론에 사용할 파라미터 정의
+  - 하이퍼 파라미터(device, batch_size, epoch, learning rate) 등 학습 및 추론에 사용할 파라미터 정의
   - 모델 이름 : 가장 최근에 사용한 모델 이름으로 자동 업데이트 
   - 모델 구분 : 딥러닝 모델인지, 머신러닝 모델인지 구별
   - 모델 별 파라미터: 모델 별 사용하는 파라미터 정의
@@ -62,7 +62,7 @@
   - RPM_label_minmax_scaler.pkl
   - Temp_label_minmax_scaler.pkl
 
-utils : utils 함수들 저장 공간
+- utils : utils 함수들 저장 공간
   - data_utils.py
   - train_utils.py
   - inference_utils.py
@@ -100,7 +100,7 @@ python train.py -model(필수 X) 모델 클래스 이름
 python train.py -model Linear
 ```
 ### 추론
-python inference.py -keyword(필수) RPM인지 Temp인지 -input(필수) 42개의 입력값, 따옴표 붙여서 입력 필수, 리스트로 입력받는다. (Duration_100은 내부에서 추가, 우선은 임의로 지정)
+python inference.py -keyword(필수) RPM인지 Temp인지 -input(필수) 42개의 입력값, input -> string
 
 >예시:
 ```python

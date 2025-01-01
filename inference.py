@@ -119,6 +119,8 @@ def main(args, info):
     ## 추론
     predicted_values = inference_utils.inference(info, loaded_model, test_data)
     print(f"\n예측 {keyword}: {np.round(predicted_values, 0)}")
+
+    return str(predicted_values)
     
 if __name__ == '__main__': # 추론 파일
     args = parse_args()
