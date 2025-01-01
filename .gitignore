@@ -1,6 +1,5 @@
 *.ipynb
 /venv
-/.env
 /__pycache__
 /model_weight/*.pth
 /model_weight/*.pkl

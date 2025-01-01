@@ -94,16 +94,14 @@ class TimeSeriesModel(nn.Module):
             nn.Linear(64, output_dim)
         )
     
-    # 시계열 데이터의 모양이 batch_size, 1, 1
     def cross_attention(self, query, key, value, attention_layer):
         """Compute cross-attention."""
         attention_weights = attention_layer(query)
-        context = torch.bmm(attention_weights.transpose(-2, -1), value) # 행렬곱 수행 : X_static과 rolling_data의 결합
+        context = torch.bmm(attention_weights.transpose(-2, -1), value)
         return context
     
     def forward(self, x): 
-        # X_static, rolling_data = x["x_static"], x["x_timeSeries"]
-        X_static, rolling_data = x[:, :-1], x[:, -1:].reshape(-1, 1, 1) # rolling_data에 맞게 데이터 형식 변경 
+        X_static, rolling_data = x[:, :-1], x[:, -1:].reshape(-1, 1, 1) 
         batch_size = rolling_data.size(0)
         rolling_data = rolling_data.reshape(batch_size, 1, -1)
         conv_out = self.conv1d(rolling_data).permute(0, 2, 1)
