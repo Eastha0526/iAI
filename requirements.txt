@@ -1,10 +1,6 @@
 nvidia-cuda-runtime-cu12==12.4.127
 nvidia-cuda-cupti-cu12==12.4.127
 nvidia-cudnn-cu12==8.9.4.25
---find-links https://download.pytorch.org/whl/cu124
-torch
-torchvision
-torchaudio
 pandas
 numpy
 joblib
