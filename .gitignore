@@ -5,3 +5,4 @@
 /model_weight/*.pth
 /model_weight/*.pkl
 /scaler/*.pkl
+*.log

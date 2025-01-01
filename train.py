@@ -27,7 +27,6 @@ def main(info):
     # 로깅 설정
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
         handlers=[
             logging.FileHandler("app.log"),
             logging.StreamHandler()
@@ -44,9 +43,6 @@ def main(info):
     username = os.getenv('DB_USERNAME')
     password = os.getenv('DB_PASSWORD')
     database = os.getenv('DB_DATABASE')
-    # 데이터 프레임 저장을 위한 딕셔너리
-    dataframes_bulk_proc = {}
-    dataframes_rpm_temp = {}
     # 데이터베이스 연결
     try:
         connection = pytds.connect(server=server, database=database, user=username, password=password, port=port)
@@ -58,7 +54,6 @@ def main(info):
 
     # 경로 지정
     home_dir = os.getcwd()
-    raw_data_dir = info["RAW_DATA_DIR"] # raw_data 위치
     os.makedirs(os.path.join(home_dir, "encoder"), exist_ok=True) # encoder 파일 저장 공간 생성
     os.makedirs(os.path.join(home_dir, "scaler"), exist_ok=True) # scaler 파일 저장 공간 생성
     os.makedirs(os.path.join(home_dir, "model_weight"), exist_ok=True) # 모델 가중치 or 모델 파일 저장 공간 생성
