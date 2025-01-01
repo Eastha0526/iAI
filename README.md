@@ -3,12 +3,10 @@
 ## 파일 설명
 
 ### config.yaml
-  : raw_data들 경로, 하이퍼 파라미터(device, batch_size, epoch, learning rate 등 학습 및 추론에 사용할 파라미터 정의 -> train에서만 수정
-  : 모델 이름 : 가장 최근에 사용한 모델 이름으로 자동 업데이트 -> 추론 시 자동으로 업데이트 된 정보 사용
-  : 모델 구분 : 딥러닝 모델인지, 머신러닝 모델인지 구별
-  : 모델 별 파라미터: 모델 별 사용하는 파라미터 정의
-
-  : 추가로 필요하면 수정하면 됩니다.
+  - 하이퍼 파라미터(device, batch_size, epoch, learning rate 등 학습 및 추론에 사용할 파라미터 정의
+  - 모델 이름 : 가장 최근에 사용한 모델 이름으로 자동 업데이트 
+  - 모델 구분 : 딥러닝 모델인지, 머신러닝 모델인지 구별
+  - 모델 별 파라미터: 모델 별 사용하는 파라미터 정의
 
 ### utils
   - data_utils.py
@@ -87,16 +85,26 @@ source venv/bin/activate
 ## 실행 코드
 ### 도움말
 python [train.py | inference.py] -h : 별칭, 헤더, 설명
-예시:
+
+> 예시:
+```python
 python train.py -h
+```
 
 ### 모델 업데이트 및 가중치 저장
 python train.py -model(필수 X) 모델 클래스 이름
-예시: (Linear, TimeSeriesModel, XgbOptuna, RandomForestRegressorOptuna)
-python train.py -model Linear
 
+> 예시: (Linear, TimeSeriesModel, XgbOptuna RandomForestRegressorOptuna)
+
+```python
+python train.py -model Linear
+```
 ### 추론
 python inference.py -keyword(필수) RPM인지 Temp인지 -input(필수) 42개의 입력값, 따옴표 붙여서 입력 필수, 리스트로 입력받는다. (Duration_100은 내부에서 추가, 우선은 임의로 지정)
-예시:
+
+>예시:
+```python
 python inference.py -keyword RPM -input "스킨" "메인믹서 혼합2" "메인믹서 혼합" "0.0" "0.0" "0.0" "0.0" "0.0" "1.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "1." "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "1.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "1200" "2000"
+
 python inference.py -keyword Temp -input "톤업크림" "유상 혼합" "유상 혼합" "0.0" "0.0" "0.0" "1.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "1.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "1.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "0.0" "1800" "2000"
+```
