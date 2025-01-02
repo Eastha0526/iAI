@@ -1,3 +1,4 @@
+# yaml file for configuration of the model
 DEVICE: "cuda"
 BATCH_SIZE: 2048
 EPOCHS: 3
