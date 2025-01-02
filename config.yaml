@@ -1,17 +1,11 @@
-# 고정 파라미터
-RAW_DATA_DIR: "./raw_data"
-
-# 하이퍼 파라미터
 DEVICE: "cuda"
 BATCH_SIZE: 2048
 EPOCHS: 3
 LEARNING_RATE: 0.001
 
-# 모델 이름
-MODEL: "TimeSeriesModel"
-MODEL_MODE: Deep_Learning
+MODEL: "XgbOptuna"
+MODEL_MODE: Machine_Learning
 
-# 모델 구분
 Deep_Learning:
 - "Linear"
 - "TimeSeriesModel"
@@ -20,7 +14,6 @@ Machine_Learning:
 - "XgbOptuna"
 - "RandomForestRegressorOptuna"
 
-# 모델별 파라미터
 Linear:
   input_size: 43
   output_size: 1
@@ -32,10 +25,10 @@ TimeSeriesModel:
   hidden_dim: 1024
   output_dim: 1
 
-XgbOptuna: # 보통 num_boost_round를 높게, early_stopping_rounds를 적절히 활용하여 최적의 상태를 구한다. # 시간 제한 설정도 가능
-  num_boost_round: 5 # 트리의 갯수 # 1000
-  early_stopping_rounds: 3 # 조기 종료 범위(3번까지 진전이 없으면 종료) # 10
-  n_trials: 3 # 서로 다른 하이퍼 파라미터 조합 횟수 # 500
+XgbOptuna:
+  num_boost_round: 5
+  early_stopping_rounds: 3
+  n_trials: 3
 
 RandomForestRegressorOptuna:
   n_trials: 3

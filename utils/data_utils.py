@@ -7,6 +7,31 @@ import csv
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from sklearn.model_selection import train_test_split
 
+def raw_data_preprocess(df):
+    df = df[:-5] # 확인 결과 마지막 5개의 불필요한 행 제거
+
+    ## 밀려난 값 조정
+    none_cnt = list(df.iloc[0, :]).count(None) # 열 목록 중 None인 값의 갯수 == 밀려난 열의 수
+    if none_cnt > 0:
+        modify_idx = df[df.iloc[:, -1:].notnull().any(axis=1)].index
+        # df = swap_null(df, modify_idx, none_cnt)
+        for idx in modify_idx:
+        # 한 행에서 Null 값의 갯수마큼 col 인덱스 위치 조정
+            none_idx = [col_idx for col_idx, value in enumerate(df.iloc[idx, :]) if value==None][:none_cnt] # 밀려난 만큼만 확보
+            raw_idx = [col_idx for col_idx, _ in enumerate(df.iloc[idx, :]) if col_idx not in none_idx] # 밀린 부분의 열 번호 제외 
+            raw_idx.extend(none_idx) 
+            df.iloc[idx, :] = df.iloc[idx, raw_idx] # 열 순서 조정
+    
+    ## 조정 후 마지막 열 제거 및 columns name 재설정
+    df.columns = [col.strip() if type(col)=="str" else col for col in df.iloc[0, :]] # None 값이면 그대로 아니면 앞/뒤 공백 제거해서
+    col_cnt = len(df.iloc[0, :]) - none_cnt
+    df = df.iloc[1:, :col_cnt]
+    
+    ## 특정 자료형 형식변경
+    df["SEQKEY"] = df["SEQKEY"].apply(pd.to_numeric)
+    
+    return df
+
 # 데이터 전처리 함수
 def preprocess_dataframe(df):
     logging.info("데이터 전처리 시작")
