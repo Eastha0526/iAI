@@ -3,7 +3,7 @@ BATCH_SIZE: 2048
 EPOCHS: 3
 LEARNING_RATE: 0.001
 
-# ëª¨ë¸ ì´ë¦„
+# ¸ğµ¨ ÀÌ¸§
 MODEL: "TimeSeriesModel"
 MODEL_MODE: Deep_Learning
 
@@ -26,10 +26,10 @@ TimeSeriesModel:
   hidden_dim: 1024
   output_dim: 1
 
-XgbOptuna: # ë³´í†µ num_boost_roundë¥¼ ë†’ê²Œ, early_stopping_roundsë¥¼ ì ì ˆíˆ í™œìš©í•˜ì—¬ ìµœì ì˜ ìƒíƒœë¥¼ êµ¬í•œë‹¤. # ì‹œê°„ ì œí•œ ì„¤ì •ë„ ê°€ëŠ¥
-  num_boost_round: 5 # íŠ¸ë¦¬ì˜ ê°¯ìˆ˜ # 1000
-  early_stopping_rounds: 3 # ì¡°ê¸° ì¢…ë£Œ ë²”ìœ„(3ë²ˆê¹Œì§€ ì§„ì „ì´ ì—†ìœ¼ë©´ ì¢…ë£Œ) # 10
-  n_trials: 3 # ì„œë¡œ ë‹¤ë¥¸ í•˜ì´í¼ íŒŒë¼ë¯¸í„° ì¡°í•© íšŸìˆ˜ # 500
+XgbOptuna: # º¸Åë num_boost_round¸¦ ³ô°Ô, early_stopping_rounds¸¦ ÀûÀıÈ÷ È°¿ëÇÏ¿© ÃÖÀûÀÇ »óÅÂ¸¦ ±¸ÇÑ´Ù. # ½Ã°£ Á¦ÇÑ ¼³Á¤µµ °¡´É
+  num_boost_round: 5 # Æ®¸®ÀÇ °¹¼ö # 1000
+  early_stopping_rounds: 3 # Á¶±â Á¾·á ¹üÀ§(3¹ø±îÁö ÁøÀüÀÌ ¾øÀ¸¸é Á¾·á) # 10
+  n_trials: 3 # ¼­·Î ´Ù¸¥ ÇÏÀÌÆÛ ÆÄ¶ó¹ÌÅÍ Á¶ÇÕ È½¼ö # 500
 
 RandomForestRegressorOptuna:
   n_trials: 3
