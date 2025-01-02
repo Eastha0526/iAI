@@ -7,31 +7,6 @@ import csv
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from sklearn.model_selection import train_test_split
 
-def raw_data_preprocess(df):
-    df = df[:-5] # 확인 결과 마지막 5개의 불필요한 행 제거
-
-    ## 밀려난 값 조정
-    none_cnt = list(df.iloc[0, :]).count(None) # 열 목록 중 None인 값의 갯수 == 밀려난 열의 수
-    if none_cnt > 0:
-        modify_idx = df[df.iloc[:, -1:].notnull().any(axis=1)].index
-        # df = swap_null(df, modify_idx, none_cnt)
-        for idx in modify_idx:
-        # 한 행에서 Null 값의 갯수마큼 col 인덱스 위치 조정
-            none_idx = [col_idx for col_idx, value in enumerate(df.iloc[idx, :]) if value==None][:none_cnt] # 밀려난 만큼만 확보
-            raw_idx = [col_idx for col_idx, _ in enumerate(df.iloc[idx, :]) if col_idx not in none_idx] # 밀린 부분의 열 번호 제외 
-            raw_idx.extend(none_idx) 
-            df.iloc[idx, :] = df.iloc[idx, raw_idx] # 열 순서 조정
-    
-    ## 조정 후 마지막 열 제거 및 columns name 재설정
-    df.columns = [col.strip() if type(col)=="str" else col for col in df.iloc[0, :]] # None 값이면 그대로 아니면 앞/뒤 공백 제거해서
-    col_cnt = len(df.iloc[0, :]) - none_cnt
-    df = df.iloc[1:, :col_cnt]
-    
-    ## 특정 자료형 형식변경
-    df["SEQKEY"] = df["SEQKEY"].apply(pd.to_numeric)
-    
-    return df
-
 # 데이터 전처리 함수
 def preprocess_dataframe(df):
     logging.info("데이터 전처리 시작")
@@ -61,43 +36,12 @@ def preprocess_dataframe(df):
     return df
 
 # 데이터 기입 오류 정정을 위해 csv 파일을 다시 생성
-def load_raw_data(file_path):
-    csv_list = list()
-    # 정상적인 파일 읽기 확인
-    try:
-        with open(file_path, "rt", encoding='utf-8-sig') as f:
-            reader = csv.reader(f)
-            for l in reader:
-                l = [None if value in ["", "NULL"] else value.strip() for value in l]  # null이 아닌 '' 값이 존재하여 해당 값들도 null로 변경, 앞뒤 공백 제거
-                csv_list.append(l)
-    except FileNotFoundError as e:
-        print(f"Error: File not found. Details: {e}")
-        print(f"{file_path.split('/')[-1]} 데이터 로드 실패")
-        raise
-
-    df = pd.DataFrame(csv_list)
-    df = df[:-5] # 확인 결과 마지막 5개의 불필요한 행 제거
-
-    ## 밀려난 값 조정
-    none_cnt = list(df.iloc[0, :]).count(None) # 열 목록 중 None인 값의 갯수 == 밀려난 열의 수
-    if none_cnt > 0:
-        modify_idx = df[df.iloc[:, -1:].notnull().any(axis=1)].index
-        # df = swap_null(df, modify_idx, none_cnt)
-        for idx in modify_idx:
-        # 한 행에서 Null 값의 갯수마큼 col 인덱스 위치 조정
-            none_idx = [col_idx for col_idx, value in enumerate(df.iloc[idx, :]) if value==None][:none_cnt] # 밀려난 만큼만 확보
-            raw_idx = [col_idx for col_idx, _ in enumerate(df.iloc[idx, :]) if col_idx not in none_idx] # 밀린 부분의 열 번호 제외 
-            raw_idx.extend(none_idx) 
-            df.iloc[idx, :] = df.iloc[idx, raw_idx] # 열 순서 조정
-    
-    ## 조정 후 마지막 열 제거 및 columns name 재설정
-    df.columns = [col.strip() if type(col)=="str" else col for col in df.iloc[0, :]] # None 값이면 그대로 아니면 앞/뒤 공백 제거해서
-    col_cnt = len(df.iloc[0, :]) - none_cnt
-    df = df.iloc[1:, :col_cnt]
-    
-    ## 특정 자료형 형식변경
+def load_raw_data(df):
+    object_cols = df.select_dtypes(include="object").columns
+    for col in object_cols:
+        df[col] = df[col].str.strip()
     df["SEQKEY"] = df["SEQKEY"].apply(pd.to_numeric)
-    
+
     return df
 
 # bulk를 proc에 병합하는 함수
@@ -266,42 +210,45 @@ def scaling(train_x, valid_x, test_x, save_path):
 
     return train_x.values, valid_x.values, test_x.values
 
-# data preprocessing
-def preprocessing(data, btp, keyword): 
+def preprocessing(data, btp, keyword):
+    logging.info("데이터 전처리 시작: %s", keyword)
+
     ## data와 btp 병합
     df = data_to_btp(data, btp)
-    print("데이터 병합 완")
-    
+    logging.info("데이터 병합 완료")
+
     ## 데이터 정리 및 자료형 변환
     object_cols = ["TypeJH", "OPRDSC_1", "OPRDSC_2"]
     df = change_col_types(df, object_cols)
-    print("열 형식 변환 완")
-    
+    logging.info("열 형식 변환 완료")
+
     ## null값 처리
     df = change_null(df, object_cols)
-    print("null값 처리 완")
-    
+    logging.info("null값 처리 완료")
+
     ## 최종 idx 열 생성
     df = make_idx(df, object_cols)
-    print("idx 생성 완")
-    
+    logging.info("idx 생성 완료")
+
     ## idx 열 기준 이상치 제거 및 idx 열 제거
     df = iqr_outlier(df)
-    print("이상치 제거 완")
-    
+    logging.info("이상치 제거 완료")
+
     ## Duration_100 데이터 scale
     df = time_series_scale(df)
-    
+    logging.info("데이터 스케일링 완료")
+
     ## Label Encoding
     encoding_df = encoding(df, object_cols, os.path.join(f"./encoder/{keyword}_label_encoder.pkl"))
-    print("인코딩 완")
+    logging.info("인코딩 완료")
 
     ## train, valid, test split
     train_x, train_y, valid_x, valid_y, test_x, test_y = split(encoding_df)
-    print("데이터 분할 완")
-    
+    logging.info("데이터 분할 완료")
+
     ## scaling
     train_x_s, valid_x_s, test_x_s = scaling(train_x, valid_x, test_x, os.path.join(f"./scaler/{keyword}_label_minmax_scaler.pkl"))
-    print("데이터 Scale 완")
-    
+    logging.info("데이터 스케일링 완료")
+
+    logging.info("데이터 전처리 완료: %s", keyword)
     return train_x_s, train_y, valid_x_s, valid_y, test_x_s, test_y

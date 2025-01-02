@@ -5,6 +5,7 @@ import joblib
 import torch
 import xgboost as xgb
 from ruamel.yaml import YAML
+from charset_normalizer import detect
 # ---
 from utils import utils, inference_utils
 import models
@@ -128,7 +129,12 @@ if __name__ == '__main__': # 추론 파일
     # yaml 파일 호출
     yaml = YAML()
     yaml.preserve_quotes = True  # 따옴표 유지
-    with open('config.yaml') as f:
+    with open('config.yaml', 'rb') as f:
+        raw_data = f.read()
+        result = detect(raw_data)
+        print(f"Detected encoding: {result['encoding']}")
+
+    with open('config.yaml', 'r', encoding=result['encoding']) as f:
         info = yaml.load(f)
         
     print("program start")

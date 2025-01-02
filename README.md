@@ -1,5 +1,6 @@
 # iAI (공정 예측 시스템)
 
+
 ## 파일 설명
 
 ### config.yaml
@@ -77,9 +78,11 @@
 
 ### 실행 환경
 
+**python 3.10 버전 필요**
 ```bash
-python -m venv venv
+py -3.10 -m venv venv
 source venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ## 실행 코드

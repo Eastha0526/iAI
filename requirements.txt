@@ -1,13 +1,14 @@
-nvidia-cuda-runtime-cu12==12.4.127
-nvidia-cuda-cupti-cu12==12.4.127
-nvidia-cudnn-cu12==8.9.4.25
-pandas
-numpy
-joblib
-ruamel.yaml
-xgboost
-python-tds
-python-dotenv
-scikit-learn
-tqdm
-optuna
+pip install nvidia-cuda-runtime-cu12==12.4
+pip install nvidia-cuda-cupti-cu12==12.4
+pip install nvidia-cudnn-cu12==8.9.4.25
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+pip install pandas
+pip install numpy
+pip install joblib
+pip install ruamel.yaml
+pip install xgboost
+pip install pytds
+pip install python-dotenv
+pip install scikit-learn
+pip install tqdm
+pip install optuna
