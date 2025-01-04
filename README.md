@@ -49,12 +49,6 @@
   - RPM_label_encoder.pkl
   - Temp_label_encoder.pkl
 
-- raw_data
-  - rpm 데이터.csv
-  - temp 데이터.csv
-  - bulk 데이터.csv
-  - proc 데이터.csv
-
 - model_weight : 학습된 모델 가중치 저장 공간
   - RPM_model.pth 
   - Temp_model.pth
